@@ -1,11 +1,13 @@
-import sqlite3
+
 from time import time
 from flask import Flask, jsonify, request, url_for, render_template
 
-from price_obtainer import PriceObtainer
+from API_classes import PriceObtainer, AllCurrencies
+from database import Database
 
 app = Flask(__name__)
- 
+db = Database()
+
 
 @app.route("/class", methods=["GET", "POST"])
 def hello():
@@ -23,10 +25,18 @@ def return_time():
 
 
 @app.route("/crypto/<string:token>")
-def return_token_price(token: str):
+def return_token_price(token):
     getter = PriceObtainer(token)
     price = getter.run()
+    db.add_entry(price['last_price'])
     return price
+
+
+@app.route("/currs")
+def get_currs():
+    currencies = AllCurrencies()
+    text = currencies.run()
+    return render_template('currs.html', info=text)
 
 
 @app.route("/")
