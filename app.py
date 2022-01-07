@@ -1,12 +1,21 @@
-
+from threading import Timer
 from time import time
-from flask import Flask, jsonify, request, url_for, render_template
+from flask import Flask, jsonify, request, render_template
 
 from API_classes import PriceObtainer, AllCurrencies
-from database import Database
+from extentions import db
+from utils import sched_task
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 app = Flask(__name__)
-db = Database()
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=sched_task, trigger="interval", seconds=30)
+scheduler.start()
+
+# t = Timer(5.0, sched_task)
+# t.start()
 
 
 @app.route("/class", methods=["GET", "POST"])
@@ -28,7 +37,8 @@ def return_time():
 def return_token_price(token):
     getter = PriceObtainer(token)
     price = getter.run()
-    db.add_entry(price['last_price'])
+    # db.add_entry(price['last_price'], token)
+
     return price
 
 

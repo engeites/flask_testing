@@ -1,0 +1,1 @@
+ASSETS = ["btc", 'eth']
