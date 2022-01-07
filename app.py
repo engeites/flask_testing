@@ -2,7 +2,7 @@ import sqlite3
 from time import time
 from flask import Flask, jsonify, request, url_for, render_template
 
-from scraping import PriceFinder
+from price_obtainer import PriceObtainer
 
 app = Flask(__name__)
  
@@ -24,15 +24,11 @@ def return_time():
 
 @app.route("/crypto/<string:token>")
 def return_token_price(token: str):
-    getter = PriceFinder(token)
-    return jsonify({token: getter.run()})
+    getter = PriceObtainer(token)
+    price = getter.run()
+    return price
 
 
 @app.route("/")
 def index():
     return render_template('index.html')
-
-
-@app.route("/help/<user>")
-def help(user):
-    return f"Help page just for you, {user}!"
